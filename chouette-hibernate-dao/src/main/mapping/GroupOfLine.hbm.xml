@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="fr.certu.chouette.model.neptune">
+	<class name="GroupOfLine" table="GroupOfLine" dynamic-insert="false"
+		dynamic-update="false">
+		<id name="id" type="long">
+			<generator class="identity" />
+		</id>
+		<property name="objectId" type="string" unique="true"  not-null="true"/>
+		<property name="objectVersion" type="int" />
+		<property name="creationTime" type="java.util.Date" />
+		<property name="creatorId" type="string" />
+		<property name="name" type="string" />
+
+		<property name="comment" />
+		 
+		<bag name="lines" lazy="true" inverse="true">
+			<key column="groupOfLineId" />
+			<one-to-many class="Line"/>
+		</bag>
+		 
+	</class>
+</hibernate-mapping>

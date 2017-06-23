@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="fr.certu.chouette.model.neptune">
+	<class name="PTLink" table="PTLink">
+		<id column="id" name="id" type="long">
+			<generator class="identity" />
+		</id>
+		<property name="objectId" type="string" unique="true" not-null="true"/>
+		<property name="objectVersion" type="int" />
+		<property name="creationTime" type="java.util.Date" />
+		<property name="creatorId" type="string" />
+		<property name="name" type="string" />
+		<property name="comment" type="string" />
+		<property column="linkDistance" name="linkDistance" type="java.math.BigDecimal" />
+		<many-to-one class="StopPoint" column="startOfLinkId" 
+			insert="true" update="true" lazy="no-proxy" name="startOfLink" foreign-key="ptlk_startstpt_fkey"/>
+		<many-to-one class="StopPoint" column="endOfLinkId"
+			insert="true" update="true" lazy="no-proxy" name="endOfLink" foreign-key="ptlk_endstpt_fkey"/>
+		<many-to-one class="Route" column="routeId" lazy="no-proxy"
+			name="route" />
+	</class>
+</hibernate-mapping>

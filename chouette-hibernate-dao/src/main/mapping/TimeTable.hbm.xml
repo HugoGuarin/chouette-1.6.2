@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="fr.certu.chouette.model.neptune">
+	<class name="Timetable" table="Timetable">
+		<id column="id" name="id" type="long">
+			<generator class="identity" />
+		</id>
+		<property name="objectId" type="string" unique="true" not-null="true"/>
+		<property name="objectVersion" type="int" />
+		<property name="creationTime" type="java.util.Date" />
+		<property name="creatorId" type="string" />
+
+		<property name="comment" type="string" />
+		<property name="version" type="string" />
+		<property name="intDayTypes" />
+		<list lazy="false" name="calendarDays" table="timetable_date">
+			<key column="timetableId"  foreign-key="tm_date_fkey"/>
+			<list-index base="0" column="position" />
+			<element column="date" type="date" />
+		</list>
+		<list lazy="false" name="periods" table="timetable_period">
+			<key column="timeTableId" foreign-key="tm_period_fkey"/>
+			<list-index base="0" column="position" />
+			<composite-element class="Period">
+				<property name="startDate" column="periodstart" type="date" />
+				<property name="endDate" column="periodend" type="date" />
+			</composite-element>
+		</list>
+		<bag name="vehicleJourneys" table="timetablevehiclejourney" lazy="false" inverse="true">
+			<key column="timetableId" />
+			<many-to-many column="vehiclejourneyId" class="VehicleJourney" />
+		</bag>
+		
+	</class>
+</hibernate-mapping>

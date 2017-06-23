@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!--
+ @@LICENCE@@ Société DRYADE
+
+ Chouette project  : paramétrage Objet - Base
+
+ Change history :
+ Date         | Auteur         | Libéllé
+ =============+================+==============================================
+ 19 av. 2011 |Mamadou KEIRA    | init
+ =============+================+==============================================
+
+ Version : $Revision: 1.0 $
+-->
+<hibernate-mapping package="fr.certu.chouette.model.neptune">
+	<class name="TimeSlot" table="TimeSlot">
+		<id column="id" name="id" type="long">
+			<generator class="identity" />
+		</id>
+		<property name="objectId" type="string" unique="true" not-null="true"/>
+		<property name="objectVersion" type="int" />
+		<property name="creationTime" type="java.util.Date" />
+		<property name="creatorId" type="string" />
+		<property name="name" type="string" />
+		<property name="beginningSlotTime" type="java.util.Date" />
+		<property name="endSlotTime" type="java.util.Date" />
+		<property name="firstDepartureTimeInSlot" type="java.util.Date" />
+		<property name="lastDepartureTimeInSlot" type="java.util.Date" />
+	</class>
+</hibernate-mapping>

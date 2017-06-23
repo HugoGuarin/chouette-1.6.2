@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- <beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+   http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd"
+	default-init-method="init">
+	 -->
+	<beans 	xmlns="http://www.springframework.org/schema/beans"
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xmlns:tx="http://www.springframework.org/schema/tx"
+			xsi:schemaLocation="http://www.springframework.org/schema/beans 
+								http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       							http://www.springframework.org/schema/aop 
+       							http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+       							http://www.springframework.org/schema/tx 
+       							http://www.springframework.org/schema/tx/spring-tx-2.5.xsd"
+       							default-init-method="init">
+
+	<bean id="chouetteDataSource" class="fr.certu.chouette.dao.ChouetteDriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${hibernate.username}" />
+		<property name="password" value="${hibernate.password}" />
+		<property name="databaseSchema" value="${database.schema}" />
+	</bean>
+
+<!-- 	<bean id="profiler" class="fr.certu.chouette.spring.profiler.SimpleProfiler">
+		execute before the transactional advice (hence the lower order number)
+		<property name="order" value="1" />
+	</bean>
+
+	<bean id="creationControleur" class="fr.certu.chouette.spring.profiler.CreationControleur">
+		execute before the transactional advice (hence the lower order number)
+		<property name="order" value="0" />
+	</bean>
+
+	Enable @Transactional support
+	<tx:annotation-driven />
+
+	Enable @AspectJ support
+	<aop:aspectj-autoproxy />
+
+	<aop:config>
+		order value is higher than the profiling aspect
+		<aop:advisor id="managerTx" advice-ref="txAdvice"
+			pointcut="execution(* *..manager.*Manager.*(..))" order="2" />
+		<aop:aspect id="profilingAspect" ref="profiler">
+			<aop:pointcut id="serviceMethodWithReturnValue"
+				expression="execution(* *..manager.*Manager.*(..))" />
+			<aop:around method="profile" pointcut-ref="serviceMethodWithReturnValue" />
+		</aop:aspect>
+		<aop:aspect id="creatingAspect" ref="creationControleur">
+			<aop:pointcut id="createMethodWithReturnValue"
+				expression="execution(* *..*..manager.*Manager.*(..)).*Manager.addNew(..))" />
+			<aop:around method="creationProtect" pointcut-ref="createMethodWithReturnValue" />
+		</aop:aspect>
+	</aop:config>
+
+	<tx:advice id="txAdvice">
+		<tx:attributes>
+			<tx:method name="get*" read-only="false" />
+			<tx:method name="*" rollback-for="Exception" />
+		</tx:attributes>
+	</tx:advice>
+ -->
+
+	<bean id="sessionFactory"
+		class="fr.certu.chouette.dao.hibernate.ChouetteSessionFactoryBean"
+		lazy-init="true">
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">fr.certu.chouette.dao.hibernate.ExtendedPostgresSQLDialect
+				</prop>
+				<!-- TODO : a passer en update avant livraison si create-drop -->
+				<prop key="hibernate.hbm2ddl.auto">${database.hbm2ddl.auto}</prop>
+				<prop key="hibernate.show_sql">${database.showsql}</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.default_schema">${database.schema}</prop>
+			</props>
+		</property>
+		<property name="dataSource" ref="chouetteDataSource" />
+		<property name="mappingResources">
+			<list>
+				<value>fr/certu/chouette/model/neptune/AccessLink.hbm.xml</value>
+				<value>fr/certu/chouette/model/neptune/AccessPoint.hbm.xml</value>
+				<value>fr/certu/chouette/model/neptune/Company.hbm.xml</value>
+				<value>fr/certu/chouette/model/neptune/ConnectionLink.hbm.xml
+				</value>
+				<value>fr/certu/chouette/model/neptune/Facility.hbm.xml</value>
+				<value>fr/certu/chouette/model/neptune/GroupOfLine.hbm.xml</value>
+				<value>fr/certu/chouette/model/neptune/JourneyPattern.hbm.xml
+				</value>
+				<value>fr/certu/chouette/model/neptune/Line.hbm.xml</value>
+				<value>fr/certu/chouette/model/neptune/PTLink.hbm.xml</value>
+				<value>fr/certu/chouette/model/neptune/PTNetwork.hbm.xml</value>
+				<value>fr/certu/chouette/model/neptune/RestrictionConstraint.hbm.xml
+				</value>
+				<value>fr/certu/chouette/model/neptune/Route.hbm.xml</value>
+				<value>fr/certu/chouette/model/neptune/StopArea.hbm.xml</value>
+				<value>fr/certu/chouette/model/neptune/StopPoint.hbm.xml</value>
+				<value>fr/certu/chouette/model/neptune/TimeSlot.hbm.xml</value>
+				<value>fr/certu/chouette/model/neptune/TimeTable.hbm.xml</value>
+				<value>fr/certu/chouette/model/neptune/VehicleJourney.hbm.xml
+				</value>
+			</list>
+		</property>
+		<!-- chouette specific parameters to complete hibernate update schema action -->
+		<property name="strategy">
+			<value>${database.hbm2ddl.auto}</value>
+		</property>
+		<property name="dropConstraintKeySql">
+			<value>ALTER TABLE ${database.schema}.{0} DROP CONSTRAINT {1} CASCADE
+			</value>
+		</property>
+		<property name="getForeignKeysSql">
+			<value>select i.constraint_name, i.table_name, k.column_name,
+				u.table_name as target_table,u.column_name as target_column,
+				r.match_option, r.update_rule, r.delete_rule
+				from
+				information_schema.table_constraints i,
+				information_schema.key_column_usage k,
+				information_schema.constraint_column_usage u,
+				information_schema.referential_constraints r
+				where i.constraint_schema = '${database.schema}' 
+				and i.constraint_type = 'FOREIGN KEY'
+				and u.constraint_schema = i.constraint_schema 
+				and u.constraint_name = i.constraint_name
+				and k.constraint_schema = i.constraint_schema 
+				and k.constraint_name =	i.constraint_name
+				and r.constraint_schema = i.constraint_schema 
+				and r.constraint_name = i.constraint_name
+				order by i.table_name, k.column_name </value>
+		</property>
+		<property name="addForeignKeySql">
+			<value>ALTER TABLE ${database.schema}.{0}
+				ADD CONSTRAINT {1} FOREIGN KEY ({2})
+				REFERENCES ${database.schema}.{3} ({4})
+				ON UPDATE {6} ON DELETE {7}</value>
+		</property>
+		<property name="cascadeDeleteFkeys">
+			<list>
+				<value>aclk_acpt_fkey</value>
+				<value>aclk_area_fkey</value>
+				<value>colk_endarea_fkey</value>
+				<value>colk_startarea_fkey</value>
+				<value>faci_colk_fkey</value>
+				<value>faci_line_fkey</value>
+				<value>faci_area_fkey</value>
+				<value>faci_stpt_fkey</value>
+				<value>facility_feature_fkey</value>
+				<value>jp_route_fkey</value>
+				<value>jpsp_jp_fkey</value>
+				<value>jpsp_stoppoint_fkey</value>
+				<value>ptlink_route_fkey</value>
+				<value>route_line_fkey</value>
+				<value>stoppoint_route_fkey</value>
+				<value>tm_date_fkey</value>
+				<value>tm_period_fkey</value>
+				<value>vjtm_tm_fkey</value>
+				<value>vjtm_vj_fkey</value>
+				<value>vj_jp_fkey</value>
+				<value>vj_route_fkey</value>
+				<value>vjas_sp_fkey</value>
+				<value>vjas_vj_fkey</value>
+				<value>stoparea_parent_fkey</value>
+				<value>stoparea_child_fkey</value>
+			</list>
+		</property>
+		<property name="setNullDeleteFkeys">
+			<list>
+				<value>line_company_fkey</value>
+				<value>line_glines_fkey</value>
+				<value>line_ptnetwork_fkey</value>
+				<value>area_parent_fkey</value>
+				<value>vj_company_fkey</value>
+				<value>vj_timeslot_fkey</value>
+			</list>
+		</property>
+		<property name="noActionDeleteFkeys">
+			<list>
+				<value>ptlk_endstpt_fkey</value>
+				<value>ptlk_startstpt_fkey</value>
+				<value>stoppoint_area_fkey</value>
+			</list>
+		</property>
+		<property name="getPrimaryKeysSql">
+			<value>select i.constraint_name, i.table_name, u.column_name
+				from
+				information_schema.table_constraints i,
+				information_schema.constraint_column_usage u
+				where
+				i.constraint_schema = '${database.schema}'
+				and constraint_type = 'PRIMARY KEY'
+				and i.constraint_schema = u.constraint_schema
+				and i.constraint_name = u.constraint_name
+				order by i.table_name,i.constraint_name</value>
+		</property>
+		<property name="addPrimaryKeySql">
+			<value>ALTER TABLE ${database.schema}.{0}
+				ADD CONSTRAINT {1} PRIMARY KEY ({2})
+				</value>
+		</property>
+		<property name="primaryKeys">
+			<list>
+				<bean class="fr.certu.chouette.dao.hibernate.PrimaryKeyDef">
+					<property name="key" value="timetablevehiclejourney_pkey" />
+					<property name="table" value="timetablevehiclejourney" />
+					<property name="columns" value="timetableid,vehiclejourneyid" />
+				</bean>
+				<bean class="fr.certu.chouette.dao.hibernate.PrimaryKeyDef">
+					<property name="key" value="vehiclejourneyatstop_pkey" />
+					<property name="table" value="vehiclejourneyatstop" />
+					<property name="columns" value="vehiclejourneyid,stoppointid" />
+				</bean>
+			</list>
+		</property>
+
+	</bean>
+
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<!-- Modules DAO -->
+
+	<bean id="accessLinkDao" class="fr.certu.chouette.dao.hibernate.HibernateDaoTemplate"
+		factory-method="createAccessLinkDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="accessPointDao" class="fr.certu.chouette.dao.hibernate.HibernateDaoTemplate"
+		factory-method="createAccessPointDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="companyDao" class="fr.certu.chouette.dao.hibernate.HibernateDaoTemplate"
+		factory-method="createCompanyDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="connectionLinkDao" class="fr.certu.chouette.dao.hibernate.HibernateDaoTemplate"
+		factory-method="createConnectionLinkDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="facilityDao" class="fr.certu.chouette.dao.hibernate.HibernateDaoTemplate"
+		factory-method="createFacilityDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="groupOfLineDao" class="fr.certu.chouette.dao.hibernate.HibernateDaoTemplate"
+		factory-method="createGroupOfLineDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="journeyPatternDao" class="fr.certu.chouette.dao.hibernate.HibernateDaoTemplate"
+		factory-method="createJourneyPatternDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="lineDao" class="fr.certu.chouette.dao.hibernate.HibernateDaoTemplate"
+		factory-method="createLineDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="ptLinkDao" class="fr.certu.chouette.dao.hibernate.HibernateDaoTemplate"
+		factory-method="createPTLinkDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="networkDao" class="fr.certu.chouette.dao.hibernate.HibernateDaoTemplate"
+		factory-method="createPTNetworkDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="restrictionConstraintDao" class="fr.certu.chouette.dao.hibernate.HibernateDaoTemplate"
+		factory-method="createRestrictionConstraintDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="routeDao" class="fr.certu.chouette.dao.hibernate.HibernateDaoTemplate"
+		factory-method="createRouteDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="stopAreaDao" class="fr.certu.chouette.dao.hibernate.HibernateDaoTemplate"
+		factory-method="createStopAreaDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="stopPointDao" class="fr.certu.chouette.dao.hibernate.HibernateDaoTemplate"
+		factory-method="createStopPointDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="timeSlotDao" class="fr.certu.chouette.dao.hibernate.HibernateDaoTemplate"
+		factory-method="createTimeSlotDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="timetableDao" class="fr.certu.chouette.dao.hibernate.HibernateDaoTemplate"
+		factory-method="createTimetableDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="vehicleJourneyDao" class="fr.certu.chouette.dao.hibernate.HibernateDaoTemplate"
+		factory-method="createVehicleJourneyDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+</beans>

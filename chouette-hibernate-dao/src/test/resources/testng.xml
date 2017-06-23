@@ -1,0 +1,20 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="Factory" verbose="1">
+	<test name="HibernateDao">
+		<packages>
+			<package name="fr.certu.chouette.dao.hibernate">
+			</package>
+		</packages>
+		<!-- <groups>
+			<run>
+				<include name="select" />
+			</run>
+		</groups>
+		<classes>
+			<class name="fr.certu.chouette.dao.hibernate.LineDaoTemplateTests">
+			</class>
+			<class name="fr.certu.chouette.dao.hibernate.StopAreaDaoTemplateTests" />
+		</classes> -->
+	</test>
+</suite>

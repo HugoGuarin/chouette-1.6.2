@@ -1,0 +1,9 @@
+*.jar
+*.class
+*.properties
+*.log
+.classpath
+.project
+.settings/*
+target
+build

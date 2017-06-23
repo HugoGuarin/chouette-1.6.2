@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="fr.certu.chouette.model.neptune">
+	<class name="VehicleJourney" table="VehicleJourney">
+		<id column="id" name="id" type="long">
+			<generator class="identity" />
+		</id>
+		<property name="objectId" type="string" unique="true" />
+		<property name="objectVersion" type="int" />
+		<property name="creationTime" type="java.util.Date" />
+		<property name="creatorId" type="string" />
+		<property name="comment" type="string" />
+		<property column="statusValue" name="serviceStatusValue"
+			type="fr.certu.chouette.dao.hibernate.usertype.ServiceStatusValueUserType" />
+		<property column="transportMode" name="transportMode"
+			type="fr.certu.chouette.dao.hibernate.usertype.TransportModeNameUserType" />
+		<property column="publishedJourneyName" name="publishedJourneyName" />
+		<property column="publishedJourneyIdentifier" name="publishedJourneyIdentifier" />
+		<property column="facility" name="facility" type="string" />
+		<property name="vehicleTypeIdentifier" type="string" />
+		<property column="number" name="number" type="long" />
+		<many-to-one class="Route" column="routeId" lazy="no-proxy"
+			name="route" foreign-key="vj_route_fkey"/>
+		<many-to-one class="JourneyPattern" column="journeyPatternId"
+			lazy="no-proxy" name="journeyPattern" />
+		<many-to-one class="TimeSlot" column="timeSlotId" lazy="no-proxy"
+			name="timeSlot" foreign-key="vj_timeslot_fkey"/>
+		<many-to-one class="Company" column="companyId" lazy="no-proxy"
+			name="company" foreign-key="vj_company_fkey"/>
+		<bag name="timetables" table="timetablevehiclejourney" lazy="false">
+			<key column="vehiclejourneyId" foreign-key="vjtm_vj_fkey"/>
+			<many-to-many column="timetableId" class="Timetable" foreign-key="vjtm_tm_fkey"/>
+		</bag>
+			
+		<bag lazy="false" name="vehicleJourneyAtStops" cascade="all-delete-orphan"
+			table="vehicleJourneyAtStop" order-by="position">
+			<key column="vehicleJourneyId" foreign-key="vjas_vj_fkey"/>
+
+			<composite-element class="VehicleJourneyAtStop">
+				<many-to-one class="StopPoint" column="stopPointId"
+					lazy="no-proxy" name="stopPoint" cascade="none" foreign-key="vjas_sp_fkey"/>
+				<!-- <many-to-one class="VehicleJourney" column="vehicleJourneyId" lazy="no-proxy" 
+					name="vehicleJourney" /> -->
+				<property name="connectingServiceId" />
+				<property column="boardingAlightingPossibility" name="boardingAlightingPossibility"
+					type="fr.certu.chouette.dao.hibernate.usertype.BoardingAlightingPossibilityUserType" />
+				<property name="order"  type="long" column="position"/>
+				<property name="arrivalTime" type="time" />
+				<property name="departureTime" type="time" />
+				<property name="waitingTime" type="time" />
+				<property name="elapseDuration" type="time" />
+				<property name="headwayFrequency" type="time" />
+				<property name="departure" type="boolean">
+					<column name="isDeparture" default="false">
+					</column>
+				</property>
+				<property name="arrival" type="boolean">
+					<column name="isArrival" default="false">
+					</column>
+				</property>
+			</composite-element>
+		</bag>
+	</class>
+</hibernate-mapping>
